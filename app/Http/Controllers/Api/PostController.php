@@ -28,4 +28,13 @@ class PostController extends Controller
   {
     return response()->json(Post::findOrFail($id));
   }
+
+  public function update(Request $request, $id)
+  {
+    $post = Post::findOrFail($id);
+
+    $post->update($request->only(['title', 'body']));
+
+    return response()->json($post);
+   }
 }
