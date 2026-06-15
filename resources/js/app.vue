@@ -77,6 +77,19 @@ const createPost = async () => {
     await fetchPosts();
 };
 
+const deletePost = async (id) => {
+    await axios.delete(`${API_URL}/${id}`);
+
+    // 詳細表示中なら閉じる
+    if (selectedPost.value?.id === id) {
+        selectedPost.value = null;
+        isEditing.value = false;
+    }
+
+    // 一覧更新
+    await fetchPosts();
+};
+
 // 初回読み込み
 onMounted(fetchPosts);
 </script>
@@ -95,15 +108,15 @@ onMounted(fetchPosts);
 
     <hr />
 
-    <div>
-        <h2>投稿一覧</h2>
+    <div v-for="post in posts" :key="post.id">
+        <h3 @click="fetchPost(post.id)" style="cursor: pointer">
+            {{ post.title }}
+        </h3>
 
-        <div v-for="post in posts" :key="post.id">
-            <h3 @click="fetchPost(post.id)" style="cursor: pointer">
-                {{ post.title }}
-            </h3>
-            <p>{{ post.body }}</p>
-        </div>
+        <p>{{ post.body }}</p>
+
+        <!-- 削除ボタン追加 -->
+        <button @click="deletePost(post.id)">削除</button>
     </div>
 
     <hr />
