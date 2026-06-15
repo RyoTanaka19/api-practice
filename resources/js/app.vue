@@ -4,12 +4,18 @@ import axios from "axios";
 
 const API_URL = "http://127.0.0.1:8000/api/posts";
 
-// 入力データ
+// 入力データ（作成）
 const title = ref("");
 const body = ref("");
 
-// 投稿一覧
+// 編集状態
+const isEditing = ref(false);
+const editTitle = ref("");
+const editBody = ref("");
+
+// データ
 const posts = ref([]);
+const selectedPost = ref(null);
 
 // 一覧取得
 const fetchPosts = async () => {
@@ -17,11 +23,45 @@ const fetchPosts = async () => {
     posts.value = response.data;
 };
 
-const selectedPost = ref(null);
-
+// 詳細取得
 const fetchPost = async (id) => {
     const response = await axios.get(`${API_URL}/${id}`);
     selectedPost.value = response.data;
+
+    // 詳細クリック時は編集状態リセット
+    isEditing.value = false;
+};
+
+// 編集開始
+const startEdit = () => {
+    isEditing.value = true;
+
+    editTitle.value = selectedPost.value.title;
+    editBody.value = selectedPost.value.body;
+};
+
+// 更新保存
+const saveUpdate = async () => {
+    await axios.put(`${API_URL}/${selectedPost.value.id}`, {
+        title: editTitle.value,
+        body: editBody.value,
+    });
+
+    // 画面反映
+    selectedPost.value.title = editTitle.value;
+    selectedPost.value.body = editBody.value;
+
+    isEditing.value = false;
+
+    await fetchPosts();
+};
+
+// キャンセル
+const cancelEdit = () => {
+    isEditing.value = false;
+
+    editTitle.value = selectedPost.value.title;
+    editBody.value = selectedPost.value.body;
 };
 
 // 投稿作成
@@ -31,11 +71,9 @@ const createPost = async () => {
         body: body.value,
     });
 
-    // 入力リセット
     title.value = "";
     body.value = "";
 
-    // 再読み込み
     await fetchPosts();
 };
 
@@ -72,7 +110,22 @@ onMounted(fetchPosts);
 
     <div v-if="selectedPost">
         <h2>詳細</h2>
-        <h3>{{ selectedPost.title }}</h3>
-        <p>{{ selectedPost.body }}</p>
+
+        <div v-if="!isEditing">
+            <h3>{{ selectedPost.title }}</h3>
+            <p>{{ selectedPost.body }}</p>
+
+            <button @click="startEdit">編集</button>
+        </div>
+
+        <div v-else>
+            <h2>編集フォーム</h2>
+
+            <input v-model="editTitle" />
+            <input v-model="editBody" />
+
+            <button @click="saveUpdate">更新</button>
+            <button @click="cancelEdit">キャンセル</button>
+        </div>
     </div>
 </template>
