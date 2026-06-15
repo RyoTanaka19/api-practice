@@ -17,6 +17,13 @@ const fetchPosts = async () => {
     posts.value = response.data;
 };
 
+const selectedPost = ref(null);
+
+const fetchPost = async (id) => {
+    const response = await axios.get(`${API_URL}/${id}`);
+    selectedPost.value = response.data;
+};
+
 // 投稿作成
 const createPost = async () => {
     await axios.post(API_URL, {
@@ -54,8 +61,18 @@ onMounted(fetchPosts);
         <h2>投稿一覧</h2>
 
         <div v-for="post in posts" :key="post.id">
-            <h3>{{ post.title }}</h3>
+            <h3 @click="fetchPost(post.id)" style="cursor: pointer">
+                {{ post.title }}
+            </h3>
             <p>{{ post.body }}</p>
         </div>
+    </div>
+
+    <hr />
+
+    <div v-if="selectedPost">
+        <h2>詳細</h2>
+        <h3>{{ selectedPost.title }}</h3>
+        <p>{{ selectedPost.body }}</p>
     </div>
 </template>
