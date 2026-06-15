@@ -12,4 +12,16 @@ class PostController extends Controller
     {
         return response()->json(Post::all());
     }
+
+    public function store(Request $request)
+   {
+    $validated = $request->validate([
+        'title' => 'required|string',
+        'body'  => 'required|string',
+    ]);
+
+    $post = Post::create($validated);
+
+    return response()->json($post, 201);
+   }
 }
