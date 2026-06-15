@@ -1,20 +1,21 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const API_URL = "http://127.0.0.1:8000/api/posts";
 
 const posts = ref([]);
-const selectedPost = ref(null);
 
 const fetchPosts = async () => {
     const res = await axios.get(API_URL);
     posts.value = res.data;
 };
 
-const fetchPost = async (id) => {
-    const res = await axios.get(`${API_URL}/${id}`);
-    selectedPost.value = res.data;
+const goDetail = (id) => {
+    router.push(`/posts/${id}`);
 };
 
 const deletePost = async (id) => {
@@ -36,20 +37,13 @@ onMounted(fetchPosts);
         <hr />
 
         <div v-for="post in posts" :key="post.id">
-            <h3 @click="fetchPost(post.id)" style="cursor: pointer">
+            <h3 @click="goDetail(post.id)" style="cursor: pointer; color: blue">
                 {{ post.title }}
             </h3>
+
             <p>{{ post.body }}</p>
 
             <button @click="deletePost(post.id)">削除</button>
-        </div>
-
-        <hr />
-
-        <div v-if="selectedPost">
-            <h2>詳細</h2>
-            <h3>{{ selectedPost.title }}</h3>
-            <p>{{ selectedPost.body }}</p>
         </div>
     </div>
 </template>
