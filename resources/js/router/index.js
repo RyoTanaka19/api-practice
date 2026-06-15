@@ -1,23 +1,24 @@
 import { createRouter, createWebHistory } from "vue-router";
 import PostIndex from "../views/PostIndex.vue";
 import PostCreate from "../views/PostCreate.vue";
+import PostShow from "../views/PostShow.vue";
 
 const routes = [
     {
         path: "/",
-        name: "index",
         component: PostIndex,
     },
     {
         path: "/create",
-        name: "create",
         component: PostCreate,
+    },
+    {
+        path: "/posts/:id",
+        component: PostShow,
     },
 ];
 
-const router = createRouter({
+export default createRouter({
     history: createWebHistory(),
     routes,
 });
-
-export default router;
