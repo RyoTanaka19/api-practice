@@ -33,10 +33,16 @@ class PostController extends Controller
   {
     $post = Post::findOrFail($id);
 
-    $post->update($request->only(['title', 'body']));
+    $validated = $request->validate([
+        'title' => 'required|string',
+        'body'  => 'required|string',
+    ]);
+
+    $post->update($validated);
 
     return response()->json($post);
-   }
+  }
+
    public function destroy($id)
   {
     $post = Post::findOrFail($id);
