@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import PostIndex from "../views/PostIndex.vue";
 import PostCreate from "../views/PostCreate.vue";
 import PostShow from "../views/PostShow.vue";
+import PostEdit from "../views/PostEdit.vue";
 
 const routes = [
     {
@@ -15,6 +16,10 @@ const routes = [
     {
         path: "/posts/:id",
         component: PostShow,
+    },
+    {
+        path: "/posts/:id/edit",
+        component: PostEdit,
     },
 ];
 
