@@ -26,5 +26,8 @@ onMounted(fetchPost);
         <p>{{ post.body }}</p>
 
         <button @click="router.push('/')">一覧へ戻る</button>
+
+        <!-- 追加 -->
+        <button @click="router.push(`/posts/${post.id}/edit`)">編集する</button>
     </div>
 </template>
