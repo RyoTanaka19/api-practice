@@ -8,48 +8,65 @@ use App\Models\Post;
 
 class PostController extends Controller
 {
-     public function index()
+    public function index()
     {
         return response()->json(Post::all());
     }
 
     public function store(Request $request)
-   {
-    $validated = $request->validate([
-        'title' => 'required|string',
-        'body'  => 'required|string',
-    ]);
+    {
+        $validated = $request->validate(
+            [
+                'title' => 'required|string',
+                'body'  => 'required|string',
+            ],
+            [
+                'title.required' => 'タイトルを入力してください',
+                'body.required'  => '本文を入力してください',
+                'title.string'   => 'タイトルは文字列で入力してください',
+                'body.string'    => '本文は文字列で入力してください',
+            ]
+        );
 
-    $post = Post::create($validated);
+        $post = Post::create($validated);
 
-    return response()->json($post, 201);
-   }
-   public function show($id)
-  {
-    return response()->json(Post::findOrFail($id));
-  }
+        return response()->json($post, 201);
+    }
 
-  public function update(Request $request, $id)
-  {
-    $post = Post::findOrFail($id);
+    public function show($id)
+    {
+        return response()->json(Post::findOrFail($id));
+    }
 
-    $validated = $request->validate([
-        'title' => 'required|string',
-        'body'  => 'required|string',
-    ]);
+    public function update(Request $request, $id)
+    {
+        $post = Post::findOrFail($id);
 
-    $post->update($validated);
+        $validated = $request->validate(
+            [
+                'title' => 'required|string',
+                'body'  => 'required|string',
+            ],
+            [
+                'title.required' => 'タイトルを入力してください',
+                'body.required'  => '本文を入力してください',
+                'title.string'   => 'タイトルは文字列で入力してください',
+                'body.string'    => '本文は文字列で入力してください',
+            ]
+        );
 
-    return response()->json($post);
-  }
+        $post->update($validated);
 
-   public function destroy($id)
-  {
-    $post = Post::findOrFail($id);
-    $post->delete();
+        return response()->json($post);
+    }
 
-    return response()->json([
-        'message' => '削除しました'
-    ]);
-  }
+    public function destroy($id)
+    {
+        $post = Post::findOrFail($id);
+        $post->delete();
+
+        return response()->json([
+            'message' => '削除しました'
+        ]);
+    }
 }

@@ -7,7 +7,9 @@ const router = useRouter();
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const API_URL = `${API_BASE}/posts`;
+
 const posts = ref([]);
+const message = ref("");
 
 const fetchPosts = async () => {
     const res = await axios.get(API_URL);
@@ -19,8 +21,27 @@ const goDetail = (id) => {
 };
 
 const deletePost = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
-    await fetchPosts();
+    // 削除確認
+    if (!confirm("この投稿を削除しますか？")) {
+        return;
+    }
+
+    try {
+        const res = await axios.delete(`${API_URL}/${id}`);
+
+        // フラッシュメッセージを表示
+        message.value = res.data.message;
+
+        // 投稿一覧を再取得
+        await fetchPosts();
+
+        // 3秒後にメッセージを消す
+        setTimeout(() => {
+            message.value = "";
+        }, 3000);
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 onMounted(fetchPosts);
@@ -29,6 +50,14 @@ onMounted(fetchPosts);
 <template>
     <div class="min-h-screen bg-gray-50 py-10 px-4">
         <div class="max-w-3xl mx-auto">
+            <!-- フラッシュメッセージ -->
+            <div
+                v-if="message"
+                class="mb-4 rounded-lg border border-green-300 bg-green-100 px-4 py-3 text-green-700"
+            >
+                {{ message }}
+            </div>
+
             <!-- ヘッダー -->
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-gray-800">投稿一覧</h1>
@@ -42,7 +71,7 @@ onMounted(fetchPosts);
                 </router-link>
             </div>
 
-            <!-- 空状態 -->
+            <!-- 投稿がない場合 -->
             <div
                 v-if="posts.length === 0"
                 class="text-center text-gray-500 mt-10"
@@ -50,7 +79,7 @@ onMounted(fetchPosts);
                 投稿がありません
             </div>
 
-            <!-- 投稿カード -->
+            <!-- 投稿一覧 -->
             <div
                 v-for="post in posts"
                 :key="post.id"
@@ -69,7 +98,7 @@ onMounted(fetchPosts);
                     {{ post.body }}
                 </p>
 
-                <!-- アクション -->
+                <!-- 削除ボタン -->
                 <div class="flex justify-end mt-4">
                     <button
                         @click="deletePost(post.id)"
